@@ -1,58 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import cloudflareLogo from './assets/Cloudflare_Logo.svg'
-import './App.css'
+import { useEffect, useMemo, useRef } from "react";
+import p5 from "p5";
+import { Grid } from "./Grid";
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [name, setName] = useState('unknown')
+  const canvasRef = useRef<HTMLDivElement>(null);
+  // const [scores, setScores] = useState({ white: 0, black: 0 });
 
+  const width = 600;
+  const height = 600;
+  const grid = useMemo(() => new Grid(width, height), [width, height]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const sketch = (p: p5) => {
+      p.setup = () => {
+        p.createCanvas(width, height);
+      };
+
+      p.draw = () => {
+        grid.draw(p);
+        // Update scores in state so they can be displayed in the UI
+        // setScores({
+        //   white: grid.getWhiteScore(),
+        //   black: grid.getBlackScore(),
+        // });
+      };
+    };
+
+    const myP5 = new p5(sketch, canvasRef.current);
+
+    return () => {
+      myP5.remove();
+    };
+  }, [grid]);
+
+  // return <div ref={canvasRef} className=""></div>;
   return (
-    <>
-      <div>
-        <a href='https://vite.dev' target='_blank'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-        <a href='https://workers.cloudflare.com/' target='_blank'>
-          <img src={cloudflareLogo} className='logo cloudflare' alt='Cloudflare logo' />
-        </a>
-      </div>
-      <h1>Vite + React + Cloudflare</h1>
-      <div className='card'>
-        <button
-          onClick={() => setCount((count) => count + 1)}
-          aria-label='increment'
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <div className='card'>
-        <button
-          onClick={() => {
-            fetch('/api/')
-              .then((res) => res.json() as Promise<{ name: string }>)
-              .then((data) => setName(data.name))
-          }}
-          aria-label='get name'
-        >
-          Name from API is: {name}
-        </button>
-        <p>
-          Edit <code>worker/index.ts</code> to change the name
-        </p>
-      </div>
-      <p className='read-the-docs'>
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <main className="w-full h-screen flex flex-col items-center justify-center bg-neutral-100">
+      <div
+        ref={canvasRef}
+        className="shadow-md border-2 border-neutral-200"
+      ></div>
+      {/* <div className="mt-4 text-2xl font-bold">
+        White: {scores.white} | Black: {scores.black}
+      </div> */}
+    </main>
+  );
 }
 
-export default App
+export default App;
