@@ -4,7 +4,7 @@ A visual battle simulation built with React, TypeScript, and p5.js where two bal
 
 ## Demo
 
-![Pong Wars Demo](./video.mp4)
+![Pong Wars Demo](./demo.gif)
 
 ## Features
 
